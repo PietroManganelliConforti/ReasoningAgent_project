@@ -1,0 +1,17 @@
+digraph {
+	fake [style=invisible]
+	0 [root=true]
+	1
+	2
+	3 [shape=doublecircle]
+	4
+	fake -> 0 [style=bold]
+	3 -> 4 [label=True]
+	0 -> 1 [label=red]
+	4 -> 4 [label=True]
+	0 -> 0 [label="~red"]
+	2 -> 2 [label="~blue"]
+	1 -> 1 [label="~green"]
+	2 -> 3 [label=blue]
+	1 -> 2 [label=green]
+}

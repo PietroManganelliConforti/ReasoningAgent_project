@@ -1,3 +1,5 @@
+import random
+import time
 import argparse
 import configparser
 import os
@@ -6,6 +8,8 @@ from gym_sapientino.core.configurations import (
     SapientinoAgentConfiguration,
     SapientinoConfiguration,
 )
+from gym.wrappers import TimeLimit
+from utils import get_config
 
 def main():
 
@@ -17,25 +21,66 @@ def main():
 
     configuration = configparser.ConfigParser()
     configuration.read(os.path.join('./configs/',config_file))
-    env_cfg = configuration['ENVIRONMENT']
-    colors = env_cfg['colors'].replace(' ', '').split(',')
-    # agent_conf = SapientinoAgentConfiguration(
-    #             initial_position=,
-    #             commands=,
-    #             angular_speed=,
-    #             acceleration=,
-    #             max_velocity=,
-    #             min_velocity=,
-    #         )
-    # conf = SapientinoConfiguration(
-    #     agent_configs=(agent_conf,),
-    #     grid_map=,
-    #     reward_outside_grid=,
-    #     reward_duplicate_beep=,
-    #     reward_per_step=,
-    # )
-    # env = SapientinoCase( conf, reward_ldlf, logdir)
-    env = SapientinoCase()
+
+    environment_config = get_config(configuration)
+
+    env = SapientinoCase( 
+        conf = environment_config, 
+        reward_ldlf = None, 
+        logdir = './experiments'
+        )
+
+        # Limit the length of the episode
+    env = TimeLimit(env, 100)
+
+    interactive = False
+
+    # Episodes
+    while True:
+
+        # Init episode
+        obs = env.reset()
+        done = False
+        cum_reward = 0.0
+
+        # Print
+        print(f"\n> Env reset.\nInitial observation {obs}")
+
+        while not done:
+            # Render
+            env.render()
+
+            # Compute action
+            if interactive:
+                try:
+                    action = int(input("Next action: "))
+                    if action < 0:
+                        print("Reset")
+                        env.reset()
+                        continue
+                    if action >= env.action_space.n:
+                        continue
+                except ValueError:
+                    continue
+            else:
+                action = random.randint(0, env.action_space.n - 1)
+
+            # Move env
+            obs, reward, done, _ = env.step(action)
+            cum_reward += reward
+
+            # Print
+            print(
+                "Step.",
+                f"Action {action}",
+                f"Observation {obs}",
+                f"Reward {reward}",
+                f"Done {done}",
+                sep="\n  ",
+            )
+
+            # Let us see the screen
+            time.sleep(0.1)
     
 
 if __name__ == '__main__':
