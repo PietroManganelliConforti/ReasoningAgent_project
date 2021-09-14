@@ -1,6 +1,7 @@
 # Reasoning agent projetc: Policy Networks for Non-Markovian Reinforcement Learning Rewards
 
-## Setup
+## Setup (tested on python 3.8.10 and 3.8.12)
+
 * Install environment:
 
 `git clone https://github.com/ireneb97/RA_project.git`
