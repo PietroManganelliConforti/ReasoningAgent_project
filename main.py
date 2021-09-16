@@ -33,7 +33,7 @@ def main():
         # Limit the length of the episode
     env = TimeLimit(env, 100)
 
-    interactive = False
+    # interactive = False
 
     # Episodes
     while True:
@@ -51,19 +51,19 @@ def main():
             env.render()
 
             # Compute action
-            if interactive:
-                try:
-                    action = int(input("Next action: "))
-                    if action < 0:
-                        print("Reset")
-                        env.reset()
-                        continue
-                    if action >= env.action_space.n:
-                        continue
-                except ValueError:
-                    continue
-            else:
-                action = random.randint(0, env.action_space.n - 1)
+            # if interactive:
+            #     try:
+            #         action = int(input("Next action: "))
+            #         if action < 0:
+            #             print("Reset")
+            #             env.reset()
+            #             continue
+            #         if action >= env.action_space.n:
+            #             continue
+            #     except ValueError:
+            #         continue
+            # else:
+            action = random.randint(0, env.action_space.n - 1)
 
             # Move env
             obs, reward, done, _ = env.step(action)
