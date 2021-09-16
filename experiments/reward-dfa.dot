@@ -8,10 +8,10 @@ digraph {
 	fake -> 0 [style=bold]
 	3 -> 4 [label=True]
 	0 -> 1 [label=red]
-	4 -> 4 [label=True]
-	0 -> 0 [label="~red"]
 	2 -> 2 [label="~blue"]
-	1 -> 1 [label="~green"]
+	4 -> 4 [label=True]
 	2 -> 3 [label=blue]
+	1 -> 1 [label="~green"]
 	1 -> 2 [label=green]
+	0 -> 0 [label="~red"]
 }
