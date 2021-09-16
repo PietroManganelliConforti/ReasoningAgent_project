@@ -26,8 +26,8 @@ def main():
 
     env = SapientinoCase( 
         conf = environment_config, 
-        reward_ldlf = None, 
-        logdir = './experiments'
+        reward_ldlf = configuration['ENVIRONMENT']['reward_ldlf'], 
+        logdir = './experiments/'+configuration['OTHER']['name_dir_experiment']
         )
 
         # Limit the length of the episode
@@ -64,7 +64,6 @@ def main():
             #         continue
             # else:
             action = random.randint(0, env.action_space.n - 1)
-
             # Move env
             obs, reward, done, _ = env.step(action)
             cum_reward += reward
