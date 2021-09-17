@@ -1,8 +1,6 @@
 wheel
 ./gym-sapientino-case-master/.
-torch==1.8.1
-torchvision==0.9.1
-gym==0.17.3
+gym
 matplotlib==3.4.2
 tensorboard==2.5.0
 tensorboard-data-server==0.6.1

@@ -10,8 +10,14 @@ from gym_sapientino.core.configurations import (
 )
 from gym.wrappers import TimeLimit
 from utils import get_config
+import torch
+from torch.utils.tensorboard import SummaryWriter
+
+
 
 def main():
+
+    writer = SummaryWriter()
 
     # Argument parsing
     parser = argparse.ArgumentParser(description='Train an agent on SapientinoCase.')
@@ -42,11 +48,12 @@ def main():
         obs = env.reset()
         done = False
         cum_reward = 0.0
-
+        n_episode=0
         # Print
         print(f"\n> Env reset.\nInitial observation {obs}")
 
         while not done:
+            n_episode+=1
             # Render
             env.render()
 
@@ -67,7 +74,7 @@ def main():
             # Move env
             obs, reward, done, _ = env.step(action)
             cum_reward += reward
-
+            writer.add_scalar("reward/train", cum_reward, n_episode)    
             # Print
             print(
                 "Step.",
@@ -78,6 +85,7 @@ def main():
                 sep="\n  ",
             )
 
+            writer.flush()
             # Let us see the screen
             time.sleep(0.1)
     
