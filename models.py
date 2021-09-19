@@ -1,8 +1,6 @@
 import numpy as np
 from tensorforce.agents import Agent
 from gym_sapientino_case.env import SapientinoCase
-from tensorforce.environments import Environment
-from gym.wrappers import TimeLimit
 
 def build_agent(agent, batch_size,environment,num_states_automaton,
                       hidden_layer_size,automaton_state_encoding_size,
@@ -135,9 +133,5 @@ def build_agent(agent, batch_size,environment,num_states_automaton,
 
     return agent
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
     
-    environment = SapientinoCase()
-    environment = TimeLimit(environment, 100)
-    environment = Environment.create(environment =environment,max_episode_timesteps=100,visualize =False)
-    build_agent("double_dqn",64, environment,4,64,64*4,memory=101)
