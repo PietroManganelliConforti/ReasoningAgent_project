@@ -127,6 +127,7 @@ class Trainer(object):
 
                 while not terminal:
                     #I start the training setting the actions
+                    #print(agent.act(states=states))
                     actions = agent.act(states=states)
 
                     #I execute(?) the environment obtaining the states, the reward and if Im in a terminal condition or not
