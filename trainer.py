@@ -4,7 +4,7 @@ from tensorforce.environments import Environment
 
 from one_hot import one_hot_encode
 from tqdm.auto import tqdm
-
+import numpy as np
 
 
 
@@ -85,8 +85,8 @@ class Trainer(object):
             """
 
 
-            obs = states['gymtpl0']
-            automaton_state = states['gymtpl1'][0]
+            obs = states[0]
+            automaton_state = states[1][0]
 
 
             """
@@ -95,8 +95,8 @@ class Trainer(object):
             one_hot_encoding = one_hot_encode(automaton_state,
                                               self.automaton_encoding_size,self.number_of_experts)
 
-            return dict(gymtpl0 =obs,
-                        gymtpl1 = one_hot_encoding)
+            return dict(gymtpl0 =[obs],
+                        gymtpl1 = [one_hot_encoding])
 
         agent = self.agent
         environment = self.environment
@@ -117,7 +117,7 @@ class Trainer(object):
                 #I obtain the obs and the automaton state to begin with
                 states = environment.reset()
 
-                automaton_state = states['gymtpl1'][0]
+                automaton_state = states[1][0]
                 states = pack_states(states)
 
                 #I set the initial parameters to launch the training
@@ -127,7 +127,6 @@ class Trainer(object):
 
                 while not terminal:
                     #I start the training setting the actions
-                    #print(agent.act(states=states))
                     actions = agent.act(states=states)
 
                     #I execute(?) the environment obtaining the states, the reward and if Im in a terminal condition or not
@@ -199,7 +198,7 @@ class Trainer(object):
 
 
                     #Update the cumulative reward during the training.
-                    cum_reward+=reward
+                    cum_reward += reward
 
                     #Update the episode reward during the training
                     ep_reward += reward

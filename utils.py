@@ -4,6 +4,7 @@ from gym_sapientino.core.configurations import (
 )
 from gym_sapientino.core.actions import ContinuousCommand
 import os
+import re
 
 def get_agent_configuration(config):
     initial_position_x = float(config['initial_position_x'])
@@ -42,3 +43,8 @@ def get_config(config):
     agent_config = get_agent_configuration(config['AGENT'])
     configuration = get_env_configuration(env_config, agent_config)
     return configuration
+
+def get_colors(reward_ldlf):
+    pattern_colors_on_ldlf = re.compile(r'![a-z]+*',re.IGNORECASE)
+    colors = [ re.sub('!|*', '', x) for x in pattern_colors_on_ldlf.findall(reward_ldlf)]
+    return colors
