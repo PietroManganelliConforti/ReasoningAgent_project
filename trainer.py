@@ -11,6 +11,8 @@ import numpy as np
 DEBUG = False
 
 
+
+
 class Trainer(object):
     def __init__(self,agent,environment,number_of_experts,
                  automaton_encoding_size, num_colors = 2,):
@@ -26,19 +28,27 @@ class Trainer(object):
             @automaton_state_encoding_size: (int) size of the binary encoding of the automaton state. See the report in report/pdf in section "Non markovian agent" for further details.
         """
 
+
+
         self.number_of_experts = number_of_experts
         self.automaton_encoding_size = automaton_encoding_size
+
 
         #Create both the agent and the environment that will be used a training time.
         self.agent = agent
         self.environment = environment
 
+
         self.num_colors = num_colors
+
+
 
         if DEBUG:
             print("\n################### Agent architecture ###################\n")
             architecture = self.agent.get_architecture()
             print(architecture)
+
+
 
 
 
@@ -49,7 +59,11 @@ class Trainer(object):
         """
 
 
+
+
+
         cum_reward = 0.0
+
 
 
         def pack_states(states):
@@ -105,8 +119,7 @@ class Trainer(object):
 
                 automaton_state = states[1][0]
                 states = pack_states(states)
-                #states = states["gymtpl0"]
-                
+
                 #I set the initial parameters to launch the training
                 prevAutState = 0
                 #Save the reward that you reach in the episode inside a linked list. This will be used for nice plots in the report.
@@ -115,6 +128,7 @@ class Trainer(object):
                 while not terminal:
                     #I start the training setting the actions
                     actions = agent.act(states=states)
+
                     #I execute(?) the environment obtaining the states, the reward and if Im in a terminal condition or not
                     states, terminal, reward = environment.execute(actions=actions)
 
