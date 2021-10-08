@@ -101,6 +101,7 @@ def main():
         entropy_regularization = float(tensorforce_config['entropy_bonus'])
         )
 
+<<<<<<< HEAD
     # # Train for 100 episodes
     # for episode in range(100):
 
@@ -135,6 +136,30 @@ def main():
     # environment.close()
 
     trainer = Trainer(agent,environment,NUM_STATES_AUTOMATON,AUTOMATON_STATE_ENCODING_SIZE,
+=======
+
+    #Dictionary containing the agent configuration parameters
+    #Other parameters
+    #non_markovian: (bool) boolean flag specifying whether or not to istantiate an agent with a non markovian policy network. In the project the markovian agent is used essentially as a baseline for comparisons.
+    #saver: (dict)
+
+    agent = build_agent(agent= "double_dqn",                                            #agent: (string) the name of the deep reinforcement learning algorithm used to train the agent.
+                        batch_size =int(tensorforce_config['batch_size']) ,             #batch_size: (int) the size of experience batch collected by the agent.
+                        memory =int(tensorforce_config['memory']),                      #memory: (int) the size of the agent memory.
+                        update_frequency=int(tensorforce_config['update_frequency']),   #update_frequency: (int) frequency of updates (default 20).
+                        multi_step =int(tensorforce_config['multi_step']),              #multi_step: (int) number of optimization steps, update_frequency * multi_step should be at least 1 if relative subsampling_fraction (default: 10).
+                        learning_rate=float(tensorforce_config['learning_rate']),       #learning_rate: (float) optimizer learning rate (default: 0.001)
+                        environment = environment,                                      #environment: (tensorforce.environments.Environment) istance of the tensorforce environment in which is trained.
+                        num_states_automaton =NUM_STATES_AUTOMATON,                     #num_states_automaton: (int) number of states of the goal state DFA.                     
+                        automaton_state_encoding_size=AUTOMATON_STATE_ENCODING_SIZE,    #automaton_state_encoding_size: (int) size of the binary encoding of the automaton state. See the report in report/pdf in section "Non markovian agent" for further details.
+                        hidden_layer_size=HIDDEN_STATE_SIZE,                            #hidden_layer_size: (int) number of neurons of the policy network hidden layer (default implementation features two hidden layers with an equal number of neurons).
+                        exploration =float(tensorforce_config['exploration']) ,         #exploration: (float) exploration, defined as the probability for uniformly random output in case of bool and int actions, and the standard deviation of Gaussian noise added to every output in case of float actions, specified globally or per action-type or -name (default: no exploration).
+                        entropy_regularization=float(tensorforce_config['entropy_bonus']),# entropy_regularization: (float) entropy regularization loss weight, to discourage the policy distribution from being “too certain” (default: no entropy regularization).
+                        )
+
+
+    trainer = Trainer(agent,env,NUM_STATES_AUTOMATON,AUTOMATON_STATE_ENCODING_SIZE,
+>>>>>>> 152a81488ba60ad8b1e89dae43920f4fee6180c5
                                     num_colors=num_colors)
 
     EPISODES = int(tensorforce_config['episodes'])
