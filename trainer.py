@@ -10,7 +10,10 @@ import numpy as np
 
 DEBUG = False
 
-
+def get_automaton_state_from_encoding(encoding, num_expert, encoding_size):
+    if np.max(encoding) == 0: return num_expert
+    automaton_state = np.argmax(encoding)/(encoding_size/num_expert)
+    return int(automaton_state)
 
 
 class Trainer(object):
@@ -53,72 +56,18 @@ class Trainer(object):
 
 
     def train(self,episodes = 1000):
-
-        """
-            @param episodes: (int) number of training episodes.
-        """
-
-
-
-
-
         cum_reward = 0.0
-
-
-
-        def pack_states(states):
-            """
-            comment from matteo emanuele:
-            this function is a formatting function only needed for the preparation of the automaton state and of the observation
-            in order to be given to the trainer method written. Nothing too fancy.
-
-                Desc: utility function that packs the state dictionary so that it can be passed as input to the
-                    non markovian agent.
-                Args:
-                    states: (dict) a python dictionary with two keys:
-                        'gymtpl0': (np.ndarray) contains the 7 element floating point vector representing the gym sapientino state vector.
-                        'gymtpl1': (int) represents the automaton state.
-                Returns:
-                        python dictionary with two keys:
-                            'gymtpl0': (np.ndarray) contains the 7 element floating point vector representing the gym sapientino state vector.
-                            'gymtpl1': (np.ndarray) the binary encoded representation for the automaton state (see the pdf report in ./report section "Non markovian agent" for additional details.
-            """
-
-
-            obs = states[0]
-            automaton_state = states[1][0]
-
-
-            """
-                Prepare the encoded automaton state.
-            """
-            one_hot_encoding = one_hot_encode(automaton_state,
-                                              self.automaton_encoding_size,self.number_of_experts)
-
-            return dict(gymtpl0 =[obs],
-                        gymtpl1 = [one_hot_encoding])
-
         agent = self.agent
         environment = self.environment
-
-
-
-        """
-            The training loop is inspired by the Tensorforce agent "act observe" paradigm 
-            https://tensorforce.readthedocs.io/en/latest/basics/getting-started.html
-        """
-
-
-
+        pbar = tqdm(range(episodes),desc='training',leave = True)
         try:
-            for episode in tqdm(range(episodes),desc='training',leave = True):
+            for episode in pbar:
                 terminal = False
 
                 #I obtain the obs and the automaton state to begin with
                 states = environment.reset()
 
-                automaton_state = states[1][0]
-                states = pack_states(states)
+                automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
 
                 #I set the initial parameters to launch the training
                 prevAutState = 0
@@ -133,8 +82,7 @@ class Trainer(object):
                     states, terminal, reward = environment.execute(actions=actions)
 
                     #Extract gym sapientino state and the state of the automaton.
-                    automaton_state = states['gymtpl1'][0]
-                    states = pack_states(states)
+                    automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
 
 
                     """
@@ -202,7 +150,7 @@ class Trainer(object):
 
                     #Update the episode reward during the training
                     ep_reward += reward
-
+                    pbar.set_postfix({'current_reward': reward, 'episode_reward': ep_reward, 'total_reward': cum_reward})
 
                     #let the automaton observe the reward obtained with the last action, and if he completed the task
                     agent.observe(terminal=terminal, reward=reward)

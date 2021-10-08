@@ -45,6 +45,43 @@ def get_config(config):
     return configuration
 
 def get_colors(reward_ldlf):
-    pattern_colors_on_ldlf = re.compile(r'![a-z]+*',re.IGNORECASE)
-    colors = [ re.sub('!|*', '', x) for x in pattern_colors_on_ldlf.findall(reward_ldlf)]
+    pattern_colors_on_ldlf = re.compile(r'\![a-z]+\*',re.IGNORECASE)
+    colors = [ re.sub('\!|\*', '', x) for x in pattern_colors_on_ldlf.findall(reward_ldlf)]
     return colors
+
+def test_environment(env):
+    import time
+    import random
+    while True:
+
+        # Init episode
+        obs = env.reset()
+        done = False
+        cum_reward = 0.0
+
+        # Print
+        print(f"\n> Env reset.\nInitial observation {obs}")
+
+        while not done:
+            # Render
+            env.render()
+
+            # Compute action
+            action = random.randint(0, env.action_space.n - 1)
+
+            # Move env
+            obs, reward, done, _ = env.step(action)
+            cum_reward += reward
+
+            # Print
+            print(
+                "Step.",
+                f"Action {action}",
+                f"Observation {obs}",
+                f"Reward {reward}",
+                f"Done {done}",
+                sep="\n  ",
+            )
+
+            # Let us see the screen
+            time.sleep(0.1)
