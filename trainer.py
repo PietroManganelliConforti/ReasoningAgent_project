@@ -1,17 +1,12 @@
+from enum import auto
 from tensorforce.agents import Agent
 from tensorforce.environments import Environment
-
 from tqdm.auto import tqdm
+from utils import get_automaton_state_from_encoding
 import numpy as np
 
 
-
 DEBUG = False
-
-def get_automaton_state_from_encoding(encoding, num_expert, encoding_size):
-    if np.max(encoding) == 0: return num_expert
-    automaton_state = np.argmax(encoding)/(encoding_size/num_expert)
-    return int(automaton_state)
 
 
 class Trainer(object):
@@ -60,14 +55,25 @@ class Trainer(object):
 
                     #I execute(?) the environment obtaining the states, the reward and if Im in a terminal condition or not
                     states, terminal, reward = environment.execute(actions=actions)
-
+                    
+                    #print(environment._environment.environment.aut_state_obs)
+                    
                     #Extract gym sapientino state and the state of the automaton.
-                    automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
+                    #automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
+                    #print(automaton_state)
+                    automaton_state = environment._environment.environment.aut_state_obs
 
+                    print(automaton_state)
+                    #if(automaton_state == 2):automaton_state=1
+
+                    #print(f'prev: {prevAutState}',f'{automaton_state}')
                     """
                         Reward shaping.
                     """
                     reward, terminal = self.get_reward_from_automaton_state(automaton_state, prevAutState, terminal)
+                    
+                    #if(environment._environment.environment.aut_state_obs == 2 ): reward= 500
+
                     #I update the previous state with the state in which I was in this training cycle,regardless of the fact
                     #that I have transitated in a new relevant state.
                     prevAutState = automaton_state

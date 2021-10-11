@@ -4,8 +4,8 @@ digraph {
 	1 [shape=doublecircle]
 	2
 	fake -> 0 [style=bold]
-	0 -> 0 [label="~red"]
-	2 -> 2 [label=True]
-	1 -> 2 [label=True]
 	0 -> 1 [label=red]
+	2 -> 2 [label=True]
+	0 -> 0 [label="~red"]
+	1 -> 2 [label=True]
 }

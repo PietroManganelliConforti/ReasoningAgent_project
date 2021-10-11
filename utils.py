@@ -1,4 +1,6 @@
 import os
+from gym.spaces.discrete import Discrete
+from gym.spaces.multi_discrete import MultiDiscrete
 import numpy as np
 
 from gym.spaces import Tuple, Box
@@ -24,6 +26,13 @@ def one_hot_encode(x,size, num_labels):
             k+=1
             i = i+block_size
         return ret
+
+
+def get_automaton_state_from_encoding(encoding, num_expert, encoding_size):
+    if np.max(encoding) == 0: return num_expert
+    automaton_state = np.argmax(encoding)/(encoding_size/num_expert)
+    return int(automaton_state)
+
 
 def get_agent_configuration(config):
     initial_position_x = float(config['initial_position_x'])
@@ -100,12 +109,14 @@ class CustomEnv(ObservationWrapper):
             conf = environment_config, 
             reward_ldlf = configuration['ENVIRONMENT']['reward_ldlf'], 
             logdir = './experiments/'+configuration['OTHER']['name_dir_experiment']
-            )
+            ) 
         ObservationWrapper.__init__(self,env)
         self.observation_space = Tuple((env.observation_space[0], 
             Box(low=np.array([0]*self.automaton_state_encoding_size), high=np.array([1]*self.automaton_state_encoding_size), dtype=np.float32)))
+        self.aut_state_obs=0
 
     def observation(self, observation):
+        self.aut_state_obs=observation[1][0]
         return (observation[0], self.encode(observation[1][0]))
     
     def encode(self, automaton_state):
@@ -116,3 +127,13 @@ class CustomEnv(ObservationWrapper):
             one_hot_encoding = one_hot_encoding.astype(np.float32)
 
             return one_hot_encoding
+
+
+
+
+def main():
+    a= one_hot_encode(1, 8, 1)
+    print(a)
+    print(get_automaton_state_from_encoding(a,1,128))
+if __name__ == '__main__':
+    main()
