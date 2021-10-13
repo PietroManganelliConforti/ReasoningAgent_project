@@ -61,7 +61,7 @@ def main():
         entropy_regularization = float(tensorforce_config['entropy_bonus'])
         )
 
-    trainer = Trainer(agent,environment,NUM_STATES_AUTOMATON,AUTOMATON_STATE_ENCODING_SIZE,num_colors=num_colors)
+    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE,num_colors=num_colors)
     training_results = trainer.train(episodes=EPISODES)
 
     print("Training of the agent complete: results are: ")
