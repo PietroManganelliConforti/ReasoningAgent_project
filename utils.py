@@ -14,18 +14,18 @@ from gym_sapientino.core.actions import ContinuousCommand
 
 def one_hot_encode(x,size, num_labels):
     ret = np.zeros(size,dtype = np.float)
-    if size%num_labels !=0:
-        return ret
-    else:
-        block_size = int(size/num_labels)
-        i = 0
-        k = 0
-        while(i<size):
-            if k == x:
-                ret[i:i+block_size] = 1.0
-            k+=1
-            i = i+block_size
-        return ret
+    block_size = int(size/num_labels)
+    i = 0
+    k = 0
+    while(i<size):
+        if k == x:
+            ret[i:i+block_size] = 1.0
+        k+=1
+        i = i+block_size
+    if size%num_labels !=0 and x == num_labels-1:
+        for i in range(0,size%num_labels):
+            ret[block_size*num_labels+i]=1
+    return ret
 
 
 def get_automaton_state_from_encoding(encoding, num_expert, encoding_size):
@@ -112,10 +112,10 @@ class CustomEnv(ObservationWrapper):
         ObservationWrapper.__init__(self,env)
         self.observation_space = Tuple((env.observation_space[0], 
             Box(low=np.array([0]*self.automaton_state_encoding_size), high=np.array([1]*self.automaton_state_encoding_size), dtype=np.float32)))
-        #self.aut_state_obs=0
+        self.aut_state_obs=0
 
     def observation(self, observation):
-        #self.aut_state_obs=observation[1][0]
+        self.aut_state_obs=observation[1][0]
         return (observation[0], self.encode(observation[1][0]))
     
     def encode(self, automaton_state):
@@ -131,9 +131,9 @@ class CustomEnv(ObservationWrapper):
 
 
 def main():
-    a= one_hot_encode(1, 8, 1)
+    a= one_hot_encode(1, 65, 3)
     print(a)
-    print(get_automaton_state_from_encoding(a,1,128))
+    #print(get_automaton_state_from_encoding(a,1,128))
     
 if __name__ == '__main__':
     main()

@@ -42,7 +42,8 @@ class Trainer(object):
                 #I obtain the obs and the automaton state to begin with
                 states = environment.reset()
 
-                automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
+                #automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
+                automaton_state = environment._environment.environment.aut_state_obs
 
                 #I set the initial parameters to launch the training
                 prevAutState = 0
@@ -57,9 +58,9 @@ class Trainer(object):
                     states, terminal, reward = environment.execute(actions=actions)
                     
                     #Extract gym sapientino state and the state of the automaton.
-                    automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
+                    #automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
                     
-                    #automaton_state = environment._environment.environment.aut_state_obs
+                    automaton_state = environment._environment.environment.aut_state_obs
                     
                     """
                         Reward shaping.
