@@ -93,9 +93,8 @@ def test_environment(env):
 class CustomEnv(ObservationWrapper):
     def __init__(self, configuration):
         environment_config = get_config(configuration)
-        tensorforce_config = configuration['TENSORFORCE']
         self.num_of_experts = len(get_colors(configuration['ENVIRONMENT']['reward_ldlf']))
-        self.automaton_state_encoding_size = int(tensorforce_config['hidden_size'])*(self.num_of_experts+1)
+        self.automaton_state_encoding_size = int(configuration['TENSORFORCE']['hidden_size'])*(self.num_of_experts+1)
         env = SapientinoCase( 
             conf = environment_config, 
             reward_ldlf = configuration['ENVIRONMENT']['reward_ldlf'], 

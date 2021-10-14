@@ -4,10 +4,6 @@ from tensorforce.environments import Environment
 from tqdm.auto import tqdm
 import numpy as np
 
-
-
-DEBUG = False
-
 def get_automaton_state_from_encoding(encoding, num_expert, encoding_size):
     if np.max(encoding) == 0: return num_expert
     automaton_state = np.argmax(encoding)/(encoding_size/num_expert)
