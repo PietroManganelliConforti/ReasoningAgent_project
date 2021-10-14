@@ -18,6 +18,7 @@ def main(**kwargs):
     configuration = configparser.ConfigParser()
     configuration.read(os.path.join('./configs/',config_file))
     if kwargs:
+        kwargs = kwargs['args']
         for conf in kwargs:
             if conf in configuration['TENSORFORCE'].keys():
                 configuration['TENSORFORCE'][conf] = kwargs[conf]
@@ -79,21 +80,25 @@ def main(**kwargs):
     print("Training of the agent complete: results are: ")
     print(training_results)
     dict_res = training_results
-    dict_res['configuration'] = configuration
+    dict_res['configuration'] = dict(configuration._sections)
     return dict_res
-    
 
 if __name__ == '__main__':
-    #main()
+    # main()
     import time
-    exploration = [0.001, 0.01, 0.1]
+    var_cycle_on = 'exploration'
+    to_cycle = [0.001, 0.01]
     data_to_write = {}
-    for num, x in enumerate(exploration):
-        dict_result = main(exploration=str(x))
-        data_to_write[num] = dict_result
-        time.sleep(10)
-    with open('training_results.txt', 'a') as outfile:
-        json.dump(data_to_write, outfile)
+    for num, x in enumerate(to_cycle):
+        dict_result = main(args={var_cycle_on: str(x)})
+        data_to_write[x] = dict_result
+        time.sleep(30)
+    with open('training_results.json', 'r+') as outfile:
+        data = json.load(outfile)
+        out = {var_cycle_on: data_to_write}
+        data.update(out)
+        outfile.seek(0)
+        json.dump(data, outfile)
 
     
 
