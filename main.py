@@ -5,8 +5,9 @@ from utils import get_colors, CustomEnv
 from tensorforce.environments import Environment
 from tensorforce.agents import Agent
 from trainer import Trainer
+import json
 
-def main():
+def main(**kwargs):
 
     # Argument parsing
     parser = argparse.ArgumentParser(description='Train an agent on SapientinoCase.')
@@ -16,6 +17,17 @@ def main():
 
     configuration = configparser.ConfigParser()
     configuration.read(os.path.join('./configs/',config_file))
+    if kwargs:
+        for conf in kwargs:
+            if conf in configuration['TENSORFORCE'].keys():
+                configuration['TENSORFORCE'][conf] = kwargs[conf]
+            elif conf in configuration['ENVIRONMENT'].keys():
+                configuration['ENVIRONMENT'][conf] = kwargs[conf]
+            elif conf in configuration['AGENT'].keys():
+                configuration['AGENT'][conf] = kwargs[conf]
+            elif conf in configuration['OTHER'].keys():
+                configuration['OTHER'][conf] = kwargs[conf]
+            
     tensorforce_config = configuration['TENSORFORCE']
     colors = get_colors(configuration['ENVIRONMENT']['reward_ldlf'])
     num_colors = len(colors)
@@ -66,10 +78,22 @@ def main():
 
     print("Training of the agent complete: results are: ")
     print(training_results)
+    dict_res = training_results
+    dict_res['configuration'] = configuration
+    return dict_res
     
 
 if __name__ == '__main__':
-    main()
+    #main()
+    import time
+    exploration = [0.001, 0.01, 0.1]
+    data_to_write = {}
+    for num, x in enumerate(exploration):
+        dict_result = main(exploration=str(x))
+        data_to_write[num] = dict_result
+        time.sleep(10)
+    with open('training_results.txt', 'a') as outfile:
+        json.dump(data_to_write, outfile)
 
     
 
