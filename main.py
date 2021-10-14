@@ -17,7 +17,6 @@ def main():
     configuration = configparser.ConfigParser()
     configuration.read(os.path.join('./configs/',config_file))
     tensorforce_config = configuration['TENSORFORCE']
-
     colors = get_colors(configuration['ENVIRONMENT']['reward_ldlf'])
     num_colors = len(colors)
     NUM_EXPERTS = num_colors
@@ -30,7 +29,7 @@ def main():
 
     # Limit the length of the episode
     environment = CustomEnv(configuration)
-    environment = Environment.create(environment=environment,max_episode_timesteps=MAX_EPISODE_TIMESTEPS,visualize =True)
+    environment = Environment.create(environment=environment,max_episode_timesteps=MAX_EPISODE_TIMESTEPS,visualize = True)
     
     agent = Agent.create(
         agent='double_dqn', 
@@ -62,7 +61,7 @@ def main():
         entropy_regularization = float(tensorforce_config['entropy_bonus'])
         )
 
-    trainer = Trainer(agent,environment,NUM_STATES_AUTOMATON,AUTOMATON_STATE_ENCODING_SIZE,num_colors=num_colors)
+    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE,num_colors=num_colors)
     training_results = trainer.train(episodes=EPISODES)
 
     print("Training of the agent complete: results are: ")
