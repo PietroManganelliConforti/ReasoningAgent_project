@@ -1,13 +1,7 @@
-from enum import auto
-from tensorforce.agents import Agent
-from tensorforce.environments import Environment
 from tqdm.auto import tqdm
-from utils import get_automaton_state_from_encoding
-import numpy as np
-
 
 DEBUG = False
-
+REWARD_STEP = 500
 
 class Trainer(object):
     def __init__(self,agent,environment,number_of_experts,
@@ -23,7 +17,7 @@ class Trainer(object):
         reward = 0.0
         for i in range(1, self.num_colors+1):
             if current_automaton_state == i and previous_automaton_state == i-1:
-                reward = 500.0
+                reward = REWARD_STEP
                 if current_automaton_state == self.num_colors:
                     terminal = True
                 return reward, terminal
@@ -43,7 +37,7 @@ class Trainer(object):
                 states = environment.reset()
 
                 #automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
-                automaton_state = environment._environment.environment.aut_state_obs
+                automaton_state = environment._environment.environment.get_automaton_state()
 
                 #I set the initial parameters to launch the training
                 prevAutState = 0
@@ -60,12 +54,16 @@ class Trainer(object):
                     #Extract gym sapientino state and the state of the automaton.
                     #automaton_state = get_automaton_state_from_encoding(states['gymtpl1'], self.number_of_experts, self.automaton_encoding_size)
                     
-                    automaton_state = environment._environment.environment.aut_state_obs
+                    automaton_state = environment._environment.environment.get_automaton_state()
                     
                     """
                         Reward shaping.
                     """
-                    reward, terminal = self.get_reward_from_automaton_state(automaton_state, prevAutState, terminal)
+                    if terminal == 2:
+                        reward = -REWARD_STEP
+                        terminal = True
+                    else:
+                        reward, terminal = self.get_reward_from_automaton_state(automaton_state, prevAutState, terminal)
                     
                    
 

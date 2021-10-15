@@ -127,6 +127,9 @@ class CustomEnv(ObservationWrapper):
 
             return one_hot_encoding
 
+    def get_automaton_state(self):
+        return self.aut_state_obs
+
 
 
 
