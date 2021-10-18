@@ -30,11 +30,12 @@ def main(**kwargs):
                 configuration['OTHER'][conf] = kwargs[conf]
             
     tensorforce_config = configuration['TENSORFORCE']
-    colors = get_colors(configuration['ENVIRONMENT']['reward_ldlf'])
+    env_config = configuration['ENVIRONMENT']
+    colors = get_colors(env_config['reward_ldlf'])
+    tg_reward = float(env_config['tg_reward'])
     num_colors = len(colors)
     NUM_EXPERTS = num_colors
     NUM_STATES_AUTOMATON = NUM_EXPERTS+1 
-
     HIDDEN_STATE_SIZE = int(tensorforce_config['hidden_size'])
     AUTOMATON_STATE_ENCODING_SIZE = HIDDEN_STATE_SIZE*NUM_STATES_AUTOMATON
     MAX_EPISODE_TIMESTEPS = int(tensorforce_config['max_timesteps'])
@@ -66,15 +67,15 @@ def main(**kwargs):
                         ],
 
                         ),
-        update_frequency=int(tensorforce_config['update_frequency']),
-        learning_rate=float(tensorforce_config['learning_rate']),
-        exploration =float(tensorforce_config['exploration']) ,
-        saver=dict(directory='model'),
-        summarizer=dict(directory='summaries',summaries=['reward','graph']),
+        update_frequency = int(tensorforce_config['update_frequency']),
+        learning_rate = float(tensorforce_config['learning_rate']),
+        exploration = float(tensorforce_config['exploration']) ,
+        saver = dict(directory='model'),
+        summarizer = dict(directory='summaries',summaries=['reward','graph']),
         entropy_regularization = float(tensorforce_config['entropy_bonus'])
         )
 
-    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE,num_colors=num_colors)
+    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE, tg_reward, num_colors=num_colors)
     training_results = trainer.train(episodes=EPISODES)
 
     print("Training of the agent complete: results are: ")
@@ -87,12 +88,13 @@ if __name__ == '__main__':
     # main()
     import time
     var_cycle_on = 'exploration'
-    to_cycle = [0.001, 0.01]
+    to_cycle = [ 3.0, 2.0 , 1.0]
     data_to_write = {}
     for num, x in enumerate(to_cycle):
+        print(f"[INFO] testing {var_cycle_on} with value {to_cycle[num]}")
         dict_result = main(args={var_cycle_on: str(x)})
         data_to_write[x] = dict_result
-        time.sleep(30)
+    time.sleep(60)
     with open('training_results.json', 'r+') as outfile:
         data = json.load(outfile)
         out = {var_cycle_on: data_to_write}

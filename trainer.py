@@ -3,20 +3,20 @@ import numpy as np
 
 class Trainer(object):
     def __init__(self,agent,environment,number_of_experts,
-                 automaton_encoding_size, tg_reward, num_colors = 1,):
+                 automaton_encoding_size, tg_reward, num_colors = 1):
 
         self.number_of_experts = number_of_experts
         self.automaton_encoding_size = automaton_encoding_size
         self.agent = agent
         self.environment = environment
         self.num_colors = num_colors
-        self.reward_step = np.round(float(tg_reward)*(1/self.num_colors), 2)
-        self.using_discount = True if self.agent.spec['discount'] > 0 else False
+        self.partial_tg_reward = np.round(float(tg_reward)*(1/self.num_colors), 2)
+        #self.using_discount = True if self.agent.spec['discount'] < 1 else False
 
     def get_reward_from_automaton_state(self, reward, current_automaton_state, previous_automaton_state, terminal):
         for i in range(1, self.num_colors+1):
             if current_automaton_state == i and previous_automaton_state == i-1:
-                reward = self.reward_step
+                reward += self.partial_tg_reward
                 if current_automaton_state == self.num_colors:
                     terminal = True
                 return reward, terminal
@@ -58,12 +58,12 @@ class Trainer(object):
                     """
                         Reward shaping.
                     """
-                    if not self.using_discount and terminal == 2:
-                        reward = -self.reward_step
-                    else:
-                        reward, terminal = self.get_reward_from_automaton_state(reward, automaton_state, prevAutState, terminal)
+                    #if not self.using_discount and terminal == 2:
+                    #    reward = -self.partial_tg_reward
+
                     
-                   
+                    reward, terminal = self.get_reward_from_automaton_state(reward, automaton_state, prevAutState, terminal)
+                    
 
                     #I update the previous state with the state in which I was in this training cycle,regardless of the fact
                     #that I have transitated in a new relevant state.
@@ -76,7 +76,7 @@ class Trainer(object):
                     #Update the episode reward during the training
                     ep_reward += reward
                     if terminal == True: num_time_visited_goal += 1
-                    pbar.set_postfix({'current_reward': reward, 
+                    pbar.set_postfix({'reward': reward, 
                                       'episode_reward': ep_reward, 
                                       'total_reward': cum_reward, 
                                       'visited_goal_for_n_time': num_time_visited_goal})
