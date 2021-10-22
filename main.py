@@ -39,6 +39,10 @@ def main(**kwargs):
     AUTOMATON_STATE_ENCODING_SIZE = HIDDEN_STATE_SIZE*NUM_STATES_AUTOMATON
     MAX_EPISODE_TIMESTEPS = int(tensorforce_config['max_timesteps'])
     EPISODES = int(tensorforce_config['episodes'])
+    TG_REWARD = configuration['ENVIRONMENT']['tg_reward']
+    DISCOUNT = float(tensorforce_config['discount'])
+    if DISCOUNT > 0 and DISCOUNT < 1: 
+        configuration['ENVIRONMENT']['reward_per_step'] = '0.0'
 
     # Limit the length of the episode
     environment = CustomEnv(configuration)
@@ -67,14 +71,22 @@ def main(**kwargs):
 
                         ),
         update_frequency=int(tensorforce_config['update_frequency']),
-        learning_rate=float(tensorforce_config['learning_rate']),
-        exploration =float(tensorforce_config['exploration']) ,
+        learning_rate=dict( type='exponential', unit='episodes', num_steps=1000,
+                            initial_value=float(tensorforce_config['learning_rate_initial_value']), 
+                            decay_rate=float(tensorforce_config['learning_rate_decay_value']),
+                            min_value=0.001),
+        exploration =dict( type='exponential', unit='episodes', num_steps=1000,
+                            initial_value=float(tensorforce_config['exploration_initial_value']), 
+                            decay_rate=float(tensorforce_config['exploration_decay_value'])) ,
         saver=dict(directory='model'),
         summarizer=dict(directory='summaries',summaries=['reward','graph']),
-        entropy_regularization = float(tensorforce_config['entropy_bonus'])
+        entropy_regularization = float(tensorforce_config['entropy_bonus']),
+        discount = DISCOUNT
         )
 
-    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE,num_colors=num_colors)
+
+
+    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE, TG_REWARD, num_colors)
     training_results = trainer.train(episodes=EPISODES)
 
     print("Training of the agent complete: results are: ")
@@ -84,21 +96,21 @@ def main(**kwargs):
     return dict_res
 
 if __name__ == '__main__':
-    # main()
-    import time
-    var_cycle_on = 'exploration'
-    to_cycle = [0.001, 0.01]
-    data_to_write = {}
-    for num, x in enumerate(to_cycle):
-        dict_result = main(args={var_cycle_on: str(x)})
-        data_to_write[x] = dict_result
-        time.sleep(30)
-    with open('training_results.json', 'r+') as outfile:
-        data = json.load(outfile)
-        out = {var_cycle_on: data_to_write}
-        data.update(out)
-        outfile.seek(0)
-        json.dump(data, outfile)
+    main()
+    # import time
+    # var_cycle_on = 'exploration'
+    # to_cycle = [0.001, 0.01]
+    # data_to_write = {}
+    # for num, x in enumerate(to_cycle):
+    #     dict_result = main(args={var_cycle_on: str(x)})
+    #     data_to_write[x] = dict_result
+    #     time.sleep(30)
+    # with open('training_results.json', 'r+') as outfile:
+    #     data = json.load(outfile)
+    #     out = {var_cycle_on: data_to_write}
+    #     data.update(out)
+    #     outfile.seek(0)
+    #     json.dump(data, outfile)
 
     
 

@@ -11,12 +11,12 @@ class Trainer(object):
         self.environment = environment
         self.num_colors = num_colors
         self.reward_step = np.round(float(tg_reward)*(1/self.num_colors), 2)
-        self.using_discount = True if self.agent.spec['discount'] > 0 else False
+        # self.using_discount = True if (self.agent.spec['discount'] > 0 and self.agent.spec['discount'] < 1) else False
 
     def get_reward_from_automaton_state(self, reward, current_automaton_state, previous_automaton_state, terminal):
         for i in range(1, self.num_colors+1):
             if current_automaton_state == i and previous_automaton_state == i-1:
-                reward = self.reward_step
+                reward += self.reward_step
                 if current_automaton_state == self.num_colors:
                     terminal = True
                 return reward, terminal
@@ -58,10 +58,9 @@ class Trainer(object):
                     """
                         Reward shaping.
                     """
-                    if not self.using_discount and terminal == 2:
-                        reward = -self.reward_step
-                    else:
-                        reward, terminal = self.get_reward_from_automaton_state(reward, automaton_state, prevAutState, terminal)
+                    # if not self.using_discount and terminal == 2:
+                    #     reward = -self.reward_step
+                    reward, terminal = self.get_reward_from_automaton_state(reward, automaton_state, prevAutState, terminal)
                     
                    
 
