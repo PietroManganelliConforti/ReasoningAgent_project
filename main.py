@@ -72,17 +72,22 @@ def main(**kwargs):
 
                         ),
         update_frequency=int(tensorforce_config['update_frequency']),
-        learning_rate=dict( type='exponential', unit='episodes', num_steps=1000,
-                            initial_value=float(tensorforce_config['learning_rate_initial_value']), 
-                            decay_rate=float(tensorforce_config['learning_rate_decay_value']),
-                            min_value=0.001),
-        exploration =dict( type='exponential', unit='episodes', num_steps=1000,
-                            initial_value=float(tensorforce_config['exploration_initial_value']), 
-                            decay_rate=float(tensorforce_config['exploration_decay_value'])) ,
+        learning_rate = float(tensorforce_config['learning_rate_initial_value']),
+        # learning_rate=dict( type='exponential', unit='episodes', num_steps=1000,
+        #                     initial_value=float(tensorforce_config['learning_rate_initial_value']), 
+        #                     decay_rate=float(tensorforce_config['learning_rate_decay_value']),
+        #                     min_value=0.001),
+        exploration = dict(type='linear', unit='episodes', num_steps=1,
+                            initial_value=1.0, final_value=0.1), 
+        # exploration =dict( type='exponential', unit='episodes', num_steps=1000,
+        #                     initial_value=float(tensorforce_config['exploration_initial_value']), 
+        #                     decay_rate=float(tensorforce_config['exploration_decay_value'])) ,
         saver=dict(directory='model'),
         summarizer=dict(directory='summaries',summaries=['reward','graph']),
         entropy_regularization = float(tensorforce_config['entropy_bonus']),
-        discount = DISCOUNT
+        discount = DISCOUNT,
+        target_sync_frequency = float(tensorforce_config['target_sync_frequency']),
+        target_update_weights = float(tensorforce_config['target_update_weights'])
         )
 
 
@@ -97,22 +102,22 @@ def main(**kwargs):
     return dict_res
 
 if __name__ == '__main__':
-    # main()
-    import time
-    var_cycle_on = 'exploration'
-    to_cycle = [ 3.0, 2.0 , 1.0]
-    data_to_write = {}
-    for num, x in enumerate(to_cycle):
-        print(f"[INFO] testing {var_cycle_on} with value {to_cycle[num]}")
-        dict_result = main(args={var_cycle_on: str(x)})
-        data_to_write[x] = dict_result
-    time.sleep(60)
-    with open('training_results.json', 'r+') as outfile:
-        data = json.load(outfile)
-        out = {var_cycle_on: data_to_write}
-        data.update(out)
-        outfile.seek(0)
-        json.dump(data, outfile)
+    main()
+    # import time
+    # var_cycle_on = 'exploration'
+    # to_cycle = [ 3.0, 2.0 , 1.0]
+    # data_to_write = {}
+    # for num, x in enumerate(to_cycle):
+    #     print(f"[INFO] testing {var_cycle_on} with value {to_cycle[num]}")
+    #     dict_result = main(args={var_cycle_on: str(x)})
+    #     data_to_write[x] = dict_result
+    # time.sleep(60)
+    # with open('training_results.json', 'r+') as outfile:
+    #     data = json.load(outfile)
+    #     out = {var_cycle_on: data_to_write}
+    #     data.update(out)
+    #     outfile.seek(0)
+    #     json.dump(data, outfile)
 
     
 
