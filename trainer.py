@@ -3,7 +3,7 @@ import numpy as np
 
 class Trainer(object):
     def __init__(self,agent,environment,number_of_experts,
-                 automaton_encoding_size, tg_reward, num_colors = 1,):
+                 automaton_encoding_size, tg_reward, num_colors = 1):
 
         self.number_of_experts = number_of_experts
         self.automaton_encoding_size = automaton_encoding_size
@@ -62,7 +62,6 @@ class Trainer(object):
                     #     reward = -self.reward_step
                     reward, terminal = self.get_reward_from_automaton_state(reward, automaton_state, prevAutState, terminal)
                     
-                   
 
                     #I update the previous state with the state in which I was in this training cycle,regardless of the fact
                     #that I have transitated in a new relevant state.
@@ -75,7 +74,7 @@ class Trainer(object):
                     #Update the episode reward during the training
                     ep_reward += reward
                     if terminal == True: num_time_visited_goal += 1
-                    pbar.set_postfix({'current_reward': reward, 
+                    pbar.set_postfix({'reward': reward, 
                                       'episode_reward': ep_reward, 
                                       'total_reward': cum_reward, 
                                       'visited_goal_for_n_time': num_time_visited_goal})

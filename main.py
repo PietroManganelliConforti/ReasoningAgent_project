@@ -30,11 +30,12 @@ def main(**kwargs):
                 configuration['OTHER'][conf] = kwargs[conf]
             
     tensorforce_config = configuration['TENSORFORCE']
-    colors = get_colors(configuration['ENVIRONMENT']['reward_ldlf'])
+    env_config = configuration['ENVIRONMENT']
+    colors = get_colors(env_config['reward_ldlf'])
+    tg_reward = float(env_config['tg_reward'])
     num_colors = len(colors)
     NUM_EXPERTS = num_colors
     NUM_STATES_AUTOMATON = NUM_EXPERTS+1 
-
     HIDDEN_STATE_SIZE = int(tensorforce_config['hidden_size'])
     AUTOMATON_STATE_ENCODING_SIZE = HIDDEN_STATE_SIZE*NUM_STATES_AUTOMATON
     MAX_EPISODE_TIMESTEPS = int(tensorforce_config['max_timesteps'])
@@ -96,21 +97,22 @@ def main(**kwargs):
     return dict_res
 
 if __name__ == '__main__':
-    main()
-    # import time
-    # var_cycle_on = 'exploration'
-    # to_cycle = [0.001, 0.01]
-    # data_to_write = {}
-    # for num, x in enumerate(to_cycle):
-    #     dict_result = main(args={var_cycle_on: str(x)})
-    #     data_to_write[x] = dict_result
-    #     time.sleep(30)
-    # with open('training_results.json', 'r+') as outfile:
-    #     data = json.load(outfile)
-    #     out = {var_cycle_on: data_to_write}
-    #     data.update(out)
-    #     outfile.seek(0)
-    #     json.dump(data, outfile)
+    # main()
+    import time
+    var_cycle_on = 'exploration'
+    to_cycle = [ 3.0, 2.0 , 1.0]
+    data_to_write = {}
+    for num, x in enumerate(to_cycle):
+        print(f"[INFO] testing {var_cycle_on} with value {to_cycle[num]}")
+        dict_result = main(args={var_cycle_on: str(x)})
+        data_to_write[x] = dict_result
+    time.sleep(60)
+    with open('training_results.json', 'r+') as outfile:
+        data = json.load(outfile)
+        out = {var_cycle_on: data_to_write}
+        data.update(out)
+        outfile.seek(0)
+        json.dump(data, outfile)
 
     
 
