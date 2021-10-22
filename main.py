@@ -77,17 +77,17 @@ def main(**kwargs):
         #                     initial_value=float(tensorforce_config['learning_rate_initial_value']), 
         #                     decay_rate=float(tensorforce_config['learning_rate_decay_value']),
         #                     min_value=0.001),
-        exploration = dict(type='linear', unit='episodes', num_steps=1,
-                            initial_value=1.0, final_value=0.1), 
-        # exploration =dict( type='exponential', unit='episodes', num_steps=1000,
-        #                     initial_value=float(tensorforce_config['exploration_initial_value']), 
-        #                     decay_rate=float(tensorforce_config['exploration_decay_value'])) ,
+        # exploration = dict(type='linear', unit='episodes', num_steps=1,
+        #                     initial_value=1.0, final_value=0.1), 
+        exploration =dict( type='exponential', unit='episodes', num_steps=1,
+                            initial_value=float(tensorforce_config['exploration_initial_value']), 
+                            decay_rate=float(tensorforce_config['exploration_decay_value'])) ,
         saver=dict(directory='model'),
         summarizer=dict(directory='summaries',summaries=['reward','graph']),
         entropy_regularization = float(tensorforce_config['entropy_bonus']),
         discount = DISCOUNT,
-        target_sync_frequency = float(tensorforce_config['target_sync_frequency']),
-        target_update_weights = float(tensorforce_config['target_update_weights'])
+        target_sync_frequency = int(tensorforce_config['target_sync_frequency']),
+        target_update_weight = float(tensorforce_config['target_update_weights'])
         )
 
 
