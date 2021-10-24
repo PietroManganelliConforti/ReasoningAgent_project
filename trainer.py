@@ -27,6 +27,7 @@ class Trainer(object):
         cum_reward = 0.0
         agent = self.agent
         environment = self.environment
+        reward_trend = 0.0
         pbar = tqdm(range(episodes),desc='[Training]',leave = True)
         try:
             for episode in pbar:
@@ -42,10 +43,15 @@ class Trainer(object):
                 prevAutState = 0
                 #Save the reward that you reach in the episode inside a linked list. This will be used for nice plots in the report.
                 ep_reward = 0.0
+                #agent internals
+                internals = agent.initial_internals()
 
                 while not terminal:
                     #I start the training setting the actions
                     actions = agent.act(states=states)
+
+                    exploration = agent.model.exploration.value().numpy()
+                    #lr = agent.model.optimizer.learning_rate.value().numpy()
 
                     #I execute(?) the environment obtaining the states, the reward and if Im in a terminal condition or not
                     states, terminal, reward = environment.execute(actions=actions)
@@ -73,11 +79,19 @@ class Trainer(object):
 
                     #Update the episode reward during the training
                     ep_reward += reward
-                    if terminal == True: num_time_visited_goal += 1
-                    pbar.set_postfix({'reward': reward, 
-                                      'episode_reward': ep_reward, 
-                                      'total_reward': cum_reward, 
-                                      'visited_goal_for_n_time': num_time_visited_goal})
+                    
+                    if episode%100==0: reward_trend = 0.0
+                    
+                    if terminal == True: 
+                        num_time_visited_goal += 1
+                        reward_trend += 1
+                 
+                    pbar.set_postfix({#'reward': reward, 
+                                      #'ep_reward': ep_reward, 
+                                      #'total_reward': cum_reward,
+                                      'exploration':exploration, 
+                                      'visited_goal_for_n_time': num_time_visited_goal,
+                                      'goal in 100ep': reward_trend})
 
                     #let the automaton observe the reward obtained with the last action, and if he completed the task
                     agent.observe(terminal=terminal, reward=reward)
