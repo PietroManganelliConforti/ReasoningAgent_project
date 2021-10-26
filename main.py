@@ -72,13 +72,17 @@ def main(**kwargs):
 
                         ),
         update_frequency=int(tensorforce_config['update_frequency']),
-        learning_rate = float(tensorforce_config['learning_rate_initial_value']),
-        # learning_rate=dict( type='exponential', unit='episodes', num_steps=1000,
+        learning_rate = dict(type='linear', unit='episodes', num_steps=EPISODES, #
+                            initial_value=0.001, final_value=0.000005),
+                        
+        #learning_rate = float(tensorforce_config['learning_rate_initial_value']),
+
+        #learning_rate=dict( type='exponential', unit='episodes', num_steps=1000,
         #                     initial_value=float(tensorforce_config['learning_rate_initial_value']), 
         #                     decay_rate=float(tensorforce_config['learning_rate_decay_value']),
-        #                     min_value=0.001),
-        exploration = dict(type='linear', unit='episodes', num_steps=5000,
-                            initial_value=0.65, final_value=0.45), 
+        #                     min_value=0.000075),
+        exploration = dict(type='linear', unit='episodes', num_steps=EPISODES, #WAS 5000
+                            initial_value=0.75, final_value=0.001), 
         #exploration =dict( type='exponential', unit='episodes', num_steps=1,
         #                    initial_value=float(tensorforce_config['exploration_initial_value']), 
         #                    decay_rate=float(tensorforce_config['exploration_decay_value'])) ,

@@ -28,9 +28,11 @@ class Trainer(object):
         agent = self.agent
         environment = self.environment
         reward_trend = 0.0
+        old_reward_trend = 0.0
         pbar = tqdm(range(episodes),desc='[Training]',leave = True)
         try:
             for episode in pbar:
+                if episode%1000 == 0: print("test")
                 terminal = False
 
                 #I obtain the obs and the automaton state to begin with
@@ -51,7 +53,7 @@ class Trainer(object):
                     actions = agent.act(states=states)
 
                     exploration = agent.model.exploration.value().numpy()
-                    #lr = agent.model.optimizer.learning_rate.value().numpy()
+                    lr = agent.model.optimizer.learning_rate.value().numpy()
 
                     #I execute(?) the environment obtaining the states, the reward and if Im in a terminal condition or not
                     states, terminal, reward = environment.execute(actions=actions)
@@ -80,7 +82,9 @@ class Trainer(object):
                     #Update the episode reward during the training
                     ep_reward += reward
                     
-                    if episode%100==0: reward_trend = 0.0
+                    if episode%100==0: 
+                        #old_reward_trend = reward_trend
+                        reward_trend = 0.0
                     
                     if terminal == True: 
                         num_time_visited_goal += 1
@@ -89,7 +93,8 @@ class Trainer(object):
                     pbar.set_postfix({#'reward': reward, 
                                       #'ep_reward': ep_reward, 
                                       #'total_reward': cum_reward,
-                                      'exploration':exploration, 
+                                      'lr': lr,
+                                      'expl':exploration, 
                                       'visited_goal_for_n_time': num_time_visited_goal,
                                       'goal in 100ep': reward_trend})
 
