@@ -3,14 +3,15 @@ import numpy as np
 
 class Trainer(object):
     def __init__(self,agent,environment,number_of_experts,
-                 automaton_encoding_size, tg_reward, num_colors = 1):
+                 automaton_encoding_size, tg_reward, num_colors = 1, goal_reward_reduction_rate = 0.65):
 
         self.number_of_experts = number_of_experts
         self.automaton_encoding_size = automaton_encoding_size
         self.agent = agent
         self.environment = environment
         self.num_colors = num_colors
-        self.reward_step = np.round(float(tg_reward)*(1/self.num_colors), 2)
+        self.goal_reward_reduction_rate = goal_reward_reduction_rate # how much of the first goals reward is given to the final one
+        self.reward_step = np.round(float(tg_reward)*(1/self.num_colors)*goal_reward_reduction_rate, 2)
         # self.using_discount = True if (self.agent.spec['discount'] > 0 and self.agent.spec['discount'] < 1) else False
 
     def get_reward_from_automaton_state(self, reward, current_automaton_state, previous_automaton_state, terminal):
@@ -19,6 +20,7 @@ class Trainer(object):
                 reward += self.reward_step
                 if current_automaton_state == self.num_colors:
                     terminal = True
+                    reward += self.reward_step*(1-self.goal_reward_reduction_rate)*(self.num_colors)
                 return reward, terminal
         return reward, terminal
 
@@ -92,11 +94,12 @@ class Trainer(object):
                  
                     pbar.set_postfix({#'reward': reward, 
                                       #'ep_reward': ep_reward, 
-                                      #'total_reward': cum_reward,
+                                      'total_reward': cum_reward,
                                       'lr': lr,
                                       'expl':exploration, 
                                       'visited_goal_for_n_time': num_time_visited_goal,
-                                      'goal in 100ep': reward_trend})
+                                      #'goal in 100ep': reward_trend
+                                      })
 
                     #let the automaton observe the reward obtained with the last action, and if he completed the task
                     agent.observe(terminal=terminal, reward=reward)

@@ -42,6 +42,12 @@ def main(**kwargs):
     EPISODES = int(tensorforce_config['episodes'])
     TG_REWARD = configuration['ENVIRONMENT']['tg_reward']
     DISCOUNT = float(tensorforce_config['discount'])
+    LR_INIT = float(tensorforce_config['learning_rate_initial_value'])
+    LR_FINAL = float(tensorforce_config['learning_rate_final_value'])
+    EXP_INIT = float(tensorforce_config['exploration_initial_value'])
+    EXP_FINAL = float(tensorforce_config['exploration_final_value'])
+
+
     if DISCOUNT > 0 and DISCOUNT < 1: 
         configuration['ENVIRONMENT']['reward_per_step'] = '0.0'
 
@@ -73,7 +79,7 @@ def main(**kwargs):
                         ),
         update_frequency=int(tensorforce_config['update_frequency']),
         learning_rate = dict(type='linear', unit='episodes', num_steps=EPISODES, #
-                            initial_value=0.001, final_value=0.000005),
+                            initial_value= LR_INIT, final_value=LR_FINAL),
                         
         #learning_rate = float(tensorforce_config['learning_rate_initial_value']),
 
@@ -82,7 +88,7 @@ def main(**kwargs):
         #                     decay_rate=float(tensorforce_config['learning_rate_decay_value']),
         #                     min_value=0.000075),
         exploration = dict(type='linear', unit='episodes', num_steps=EPISODES, #WAS 5000
-                            initial_value=0.75, final_value=0.001), 
+                            initial_value=EXP_INIT, final_value=EXP_FINAL), 
         #exploration =dict( type='exponential', unit='episodes', num_steps=1,
         #                    initial_value=float(tensorforce_config['exploration_initial_value']), 
         #                    decay_rate=float(tensorforce_config['exploration_decay_value'])) ,
