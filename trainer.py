@@ -55,7 +55,10 @@ class Trainer(object):
                     actions = agent.act(states=states)
 
                     exploration = agent.model.exploration.value().numpy()
-                    lr = agent.model.optimizer.learning_rate.value().numpy()
+                    if 'ppo' in self.agent.__module__:
+                        lr = None
+                    else:
+                        lr = agent.model.optimizer.learning_rate.value().numpy()
 
                     #I execute(?) the environment obtaining the states, the reward and if Im in a terminal condition or not
                     states, terminal, reward = environment.execute(actions=actions)

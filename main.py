@@ -31,16 +31,17 @@ def main(**kwargs):
             
     tensorforce_config = configuration['TENSORFORCE']
     env_config = configuration['ENVIRONMENT']
-    colors = get_colors(env_config['reward_ldlf'])
-    tg_reward = float(env_config['tg_reward'])
-    num_colors = len(colors)
-    NUM_EXPERTS = num_colors
+
+
+    AGENT_TYPE = configuration['AGENT']['algorithm'].lower()
+    colors= get_colors(env_config['reward_ldlf'])
+    NUM_EXPERTS = len(colors)
     NUM_STATES_AUTOMATON = NUM_EXPERTS+1 
     HIDDEN_STATE_SIZE = int(tensorforce_config['hidden_size'])
     AUTOMATON_STATE_ENCODING_SIZE = HIDDEN_STATE_SIZE*NUM_STATES_AUTOMATON
     MAX_EPISODE_TIMESTEPS = int(tensorforce_config['max_timesteps'])
     EPISODES = int(tensorforce_config['episodes'])
-    TG_REWARD = configuration['ENVIRONMENT']['tg_reward']
+    TG_REWARD = float(env_config['tg_reward'])
     DISCOUNT = float(tensorforce_config['discount'])
     LR_INIT = float(tensorforce_config['learning_rate_initial_value'])
     LR_FINAL = float(tensorforce_config['learning_rate_final_value'])
@@ -50,17 +51,15 @@ def main(**kwargs):
 
     if DISCOUNT > 0 and DISCOUNT < 1: 
         configuration['ENVIRONMENT']['reward_per_step'] = '0.0'
+    if AGENT_TYPE == 'ddqn': AGENT_TYPE = 'double_dqn'
 
     # Limit the length of the episode
     environment = CustomEnv(configuration)
     environment = Environment.create(environment=environment,max_episode_timesteps=MAX_EPISODE_TIMESTEPS,visualize = True)
-    
-    agent = Agent.create(
-        agent='double_dqn', 
-        environment=environment, 
-        memory=int(tensorforce_config['memory']), 
-        batch_size =int(tensorforce_config['batch_size']),
-        network=dict(type = 'custom',
+
+    args_for_agent = {
+        'batch_size':int(tensorforce_config['batch_size']),
+        'network':dict(type = 'custom',
                         layers= [
                             dict(type = 'retrieve',tensors= ['gymtpl0']),
                             dict(type = 'linear_normalization'),
@@ -77,32 +76,28 @@ def main(**kwargs):
                         ],
 
                         ),
-        update_frequency=int(tensorforce_config['update_frequency']),
-        learning_rate = dict(type='linear', unit='episodes', num_steps=EPISODES, #
+        'update_frequency':int(tensorforce_config['update_frequency']),
+        'learning_rate': dict(type='linear', unit='episodes', num_steps=EPISODES,
                             initial_value= LR_INIT, final_value=LR_FINAL),
-                        
-        #learning_rate = float(tensorforce_config['learning_rate_initial_value']),
-
-        #learning_rate=dict( type='exponential', unit='episodes', num_steps=1000,
-        #                     initial_value=float(tensorforce_config['learning_rate_initial_value']), 
-        #                     decay_rate=float(tensorforce_config['learning_rate_decay_value']),
-        #                     min_value=0.000075),
-        exploration = dict(type='linear', unit='episodes', num_steps=EPISODES, #WAS 5000
+        'exploration': dict(type='linear', unit='episodes', num_steps=EPISODES,
                             initial_value=EXP_INIT, final_value=EXP_FINAL), 
-        #exploration =dict( type='exponential', unit='episodes', num_steps=1,
-        #                    initial_value=float(tensorforce_config['exploration_initial_value']), 
-        #                    decay_rate=float(tensorforce_config['exploration_decay_value'])) ,
-        saver=dict(directory='model'),
-        summarizer=dict(directory='summaries',summaries=['reward','graph']),
-        entropy_regularization = float(tensorforce_config['entropy_bonus']),
-        discount = DISCOUNT,
-        target_sync_frequency = int(tensorforce_config['target_sync_frequency']),
-        target_update_weight = float(tensorforce_config['target_update_weights'])
-        )
+        'saver':dict(directory='model'),
+        'summarizer':dict(directory='summaries',summaries=['reward','graph']),
+        'entropy_regularization': float(tensorforce_config['entropy_bonus']),
+        'discount': DISCOUNT
+        }
 
+    if AGENT_TYPE == 'double_dqn':
+        args_for_agent['memory'] = int(tensorforce_config['memory'])
+        args_for_agent['target_sync_frequency'] = int(tensorforce_config['target_sync_frequency'])
+        args_for_agent['target_update_weight'] = float(tensorforce_config['target_update_weights'])
 
+    if AGENT_TYPE == 'ppo': 
+        args_for_agent['memory'] = 'minimum'
+    
+    agent = Agent.create(agent=AGENT_TYPE, environment=environment, **args_for_agent)
 
-    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE, TG_REWARD, num_colors)
+    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE, TG_REWARD, NUM_EXPERTS)
     training_results = trainer.train(episodes=EPISODES)
 
     print("Training of the agent complete: results are: ")
