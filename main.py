@@ -30,6 +30,7 @@ def main(**kwargs):
                 configuration['OTHER'][conf] = kwargs[conf]
             
     tensorforce_config = configuration['TENSORFORCE']
+    other_config = configuration['OTHER']
     env_config = configuration['ENVIRONMENT']
 
 
@@ -47,6 +48,7 @@ def main(**kwargs):
     LR_FINAL = float(tensorforce_config['learning_rate_final_value'])
     EXP_INIT = float(tensorforce_config['exploration_initial_value'])
     EXP_FINAL = float(tensorforce_config['exploration_final_value'])
+    goal_reward_reduction_rate = float(other_config['goal_reward_reduction_rate'])
 
 
     if DISCOUNT > 0 and DISCOUNT < 1: 
@@ -97,7 +99,7 @@ def main(**kwargs):
     
     agent = Agent.create(agent=AGENT_TYPE, environment=environment, **args_for_agent)
 
-    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE, TG_REWARD, NUM_EXPERTS)
+    trainer = Trainer(agent,environment,NUM_EXPERTS,AUTOMATON_STATE_ENCODING_SIZE, TG_REWARD, NUM_EXPERTS, goal_reward_reduction_rate)
     training_results = trainer.train(episodes=EPISODES)
 
     print("Training of the agent complete: results are: ")
