@@ -51,7 +51,7 @@ def get_agent_configuration(config):
             )
 
 def get_env_configuration(env_config, agent_config):
-    grid_map_file = os.path.join('./maps/', env_config['map_file'])
+    grid_map_file = env_config['map_file']
     with open(grid_map_file) as f:
         grid_map = f.readlines()
         grid_map = ''.join(grid_map)

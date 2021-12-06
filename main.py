@@ -27,13 +27,17 @@ def main():
     if not load_agent:
         config_file = args.config_file
         configuration.read(os.path.join('./configs/',config_file))
+        configuration["ENVIRONMENT"]["map_file"] = os.path.join('./maps/', configuration["ENVIRONMENT"]["map_file"])
+        print('Configuration file from: ', os.path.join('./configs/',config_file))
+        print('Map from: ', configuration["ENVIRONMENT"]["map_file"])
     else:
         configuration.read(os.path.join(args.trained_model_path, 'config.cfg'))
+        configuration["ENVIRONMENT"]["map_file"] = os.path.join(args.trained_model_path, 'map.txt')
+        print('Configuration file from: ', os.path.join(args.trained_model_path, 'config.cfg'))
+        print('Map from: ', os.path.join(args.trained_model_path, 'map.txt'))
     tensorforce_config = configuration['TENSORFORCE']
     env_config = configuration['ENVIRONMENT']
     runner_config = configuration['RUNNER']
-
-
 
     #--------------------------------
     #       CREATE ENVIRONMENT      
@@ -107,6 +111,7 @@ def main():
         if AGENT_TYPE == 'ppo': 
             args_for_agent['memory'] = 'minimum'
 
+        print('Create agent with', AGENT_TYPE)
         agent = Agent.create(agent=AGENT_TYPE, environment=environment, **args_for_agent)        
 
     else: 
@@ -114,6 +119,7 @@ def main():
         #--------------------------------
         #           LOAD AGENT          
         #--------------------------------
+        print('Loaded agent from', args.trained_model_path)
         agent = Agent.load(args.trained_model_path)
 
     #--------------------------------
@@ -135,6 +141,8 @@ def main():
         #--------------------------------
         runner.agent.save(save_folder)
         shutil.copy(os.path.join('./configs/',config_file), os.path.join(save_folder, 'config.cfg'))
+        shutil.copy(env_config['map_file'], os.path.join(save_folder, 'map.txt'))
+        print('Agent, configuration file and map saved at:', save_folder)
     else:
 
         #--------------------------------
