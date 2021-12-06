@@ -107,7 +107,7 @@ class CustomEnv(ObservationWrapper):
         env = SapientinoCase( 
             conf = environment_config, 
             reward_ldlf = configuration['ENVIRONMENT']['reward_ldlf'], 
-            logdir = './experiments/'+configuration['OTHER']['name_dir_experiment']
+            logdir = './experiments/'+configuration['ENVIRONMENT']['name_dir_experiment']
             ) 
         ObservationWrapper.__init__(self,env)
         self.observation_space = Tuple((env.observation_space[0], 
@@ -129,14 +129,3 @@ class CustomEnv(ObservationWrapper):
 
     def get_automaton_state(self):
         return self.aut_state_obs
-
-
-
-
-def main():
-    a= one_hot_encode(1, 65, 3)
-    print(a)
-    #print(get_automaton_state_from_encoding(a,1,128))
-    
-if __name__ == '__main__':
-    main()
