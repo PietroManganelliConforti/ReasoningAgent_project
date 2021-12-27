@@ -47,6 +47,12 @@ In folder `model` we saved our trained agents, you can run one of them by using 
 python3 main.py --trained_model_path model/ppo_0
 ```
 
+## Miscellaneous
+
+- You can read in details about this project [here](https://github.com/ireneb97/RA_project/blob/main/Report%20Reasoning%20Agent.pdf), inside our report.
+- You can see our video presentation [here]().
+- You can see the slides we used in our presentation [here]().
+
 ## Authors
 
 - Irene Bondanza (bondanza.1747677@studenti.uniroma1.it)
