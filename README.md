@@ -50,7 +50,7 @@ python3 main.py --trained_model_path model/ppo
 ## Miscellaneous
 
 - You can read in details about this project [here](https://github.com/ireneb97/RA_project/blob/main/Report%20Reasoning%20Agent.pdf), inside our report.
-- You can see our video presentation [here]().
+- You can see our video presentation [here](https://drive.google.com/drive/folders/10swaeyuu1BV72VbgZYNQtVvdhpy7ty2a?usp=sharing).
 - You can see the slides we used in our presentation [here]().
 
 ## Authors
