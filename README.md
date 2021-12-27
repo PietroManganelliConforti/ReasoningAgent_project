@@ -44,7 +44,7 @@ python3 main.py --config_file config1.cfg
 ## Test an agent
 In folder `model` we saved our trained agents, you can run one of them by using this command:
 ```bash
-python3 main.py --trained_model_path model/ppo_0
+python3 main.py --trained_model_path model/ppo
 ```
 
 ## Miscellaneous
